@@ -6,21 +6,7 @@
 set -e
 
 ##
-## args
-##
-for name in DB FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
-	eval "$name=\"$1\""
-	shift
-done
-
-#for name in DB PKGORIGIN PORTNAME PORTVERSION DISTVERSION MAINTAINER; do # all non-nullable fields
-#	if [ -z "$val" -o -z "$DB" ]; then
-#		echo "value for "
-#	exit 1
-#fi
-
-##
-## helper functions
+## functions
 ##
 
 log() {
@@ -83,6 +69,14 @@ list_begins_with() {
 escape_special_chars() {
 	echo "$1" | sed -e "s|'|''|g"
 }
+
+##
+## args
+##
+for name in DB FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
+	eval "$name=\"$1\""
+	shift
+done
 
 ##
 ## add Port record
