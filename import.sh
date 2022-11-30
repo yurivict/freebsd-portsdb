@@ -137,8 +137,12 @@ create_db() {
 describe_command() {
 	# build DESCRIBE_COMMAND for 'make describe'
 	local cmd_args="" # args to supply to add-port.sh
-	for name in FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
-	            MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
+	for name in \
+		FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
+		MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE \
+		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
+		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME ; \
+	do
 		if [ $name = "COMMENT" ]; then
 			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
 		else
@@ -235,6 +239,7 @@ status_report() {
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Port;') port records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM PortFlavor;') flavor records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Depends;') dependency records"
+		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitHub;') GitHub records"
 	fi
 }
 

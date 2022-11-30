@@ -13,20 +13,6 @@ log() {
 	#echo "add-port.sh: $1"
 }
 
-run_SQL() {
-	local SQL="$1"
-
-	# execute synchronously
-	if [ -n "$DB" -a "$WRITE_MODE" = "sync" ]; then
-		sqlite3 -cmd '.timeout 50000' $DB "$SQL"
-	fi
-
-	# save SQL statements into a file
-	if [ -n "$SQL_FILE" ]; then
-		echo "$SQL;" >> "$SQL_FILE"
-	fi
-}
-
 wrap_nullable_string() {
 	if [ -z "$1" ]; then
 		echo "null"
@@ -73,20 +59,24 @@ expand_dollar_sign() {
 	echo "$1" | sed -e "s|%%DOLLAR%%|$|g"
 }
 
+##
+## read supplied arguments
+##
 
-##
-## args
-##
-for name in DB FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
+for name in DB \
+	FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
+	MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE \
+	BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
+       	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME ; \
+do
 	eval "$name=\"$1\""
 	shift
 done
 
 ##
-## add Port record
+## wrap argument values
 ##
 
-#echo "... add-port.sh: wrapping values"
 PKGORIGINw=$(wrap_non_nullable_string "$PKGORIGIN")
 PORTNAMEw=$(wrap_non_nullable_string "$PORTNAME")
 PORTVERSIONw=$(wrap_non_nullable_string "$PORTVERSION")
@@ -101,11 +91,28 @@ FLAVORw=$(wrap_non_nullable_string "$FLAVOR")
 COMMENTw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$COMMENT")")")
 PKGNAMEw=$(wrap_non_nullable_string "$PKGNAME")
 PKGBASEw=$(wrap_non_nullable_string "$PKGBASE")
+USE_GITHUBw=$(wrap_non_nullable_string "$USE_GITHUB")
+GH_ACCOUNTw=$(wrap_non_nullable_string "$GH_ACCOUNT")
+GH_PROJECTw=$(wrap_non_nullable_string "$GH_PROJECT")
+GH_TAGNAMEw=$(wrap_non_nullable_string "$GH_TAGNAME")
 
 ##
 ## DB functions
 ##
 
+run_SQL() {
+	local SQL="$1"
+
+	# execute synchronously
+	if [ -n "$DB" -a "$WRITE_MODE" = "sync" ]; then
+		sqlite3 -cmd '.timeout 50000' $DB "$SQL"
+	fi
+
+	# save SQL statements into a file
+	if [ -n "$SQL_FILE" ]; then
+		echo "$SQL;" >> "$SQL_FILE"
+	fi
+}
 insert_port() {
 	run_SQL "INSERT INTO Port(PKGORIGIN,PORTNAME,PORTVERSION,DISTVERSION,DISTVERSIONPREFIX,DISTVERSIONSUFFIX,PORTREVISION,MAINTAINER,WWW,FLAVORS) VALUES ($PKGORIGINw,$PORTNAMEw,$PORTVERSIONw,$DISTVERSIONw,$DISTVERSIONPREFIXw,$DISTVERSIONSUFFIXw,$PORTREVISIONw,$MAINTAINERw,$WWWw,$FLAVORSw)"
 }
@@ -138,10 +145,17 @@ insert_dependencies() {
 		run_SQL "INSERT OR IGNORE INTO Depends(PARENT_PKGORIGIN,PARENT_FLAVOR,CHILD_PKGORIGIN,CHILD_FLAVOR,KIND) VALUES($PARENT_PKGORIGINw,$PARENT_FLAVORw,$CHILD_PKGORIGINw,$CHILD_FLAVORw,'$KIND')"
 	done
 }
+insert_github() {
+	run_SQL "INSERT INTO GitHub(PKGORIGIN, FLAVOR, USE_GITHUB, GH_ACCOUNT, GH_PROJECT, GH_TAGNAME) VALUES($PKGORIGINw,$FLAVORw,$USE_GITHUBw,$GH_ACCOUNTw,$GH_PROJECTw,$GH_TAGNAMEw)"
+}
+
+##
+## MAIN: insert records into the DB
+##
 
 if [ -z "$FLAVORS" -o $(list_begins_with "$FLAVOR" "$FLAVORS") = "YES" ]; then # no flavors or default flavor
 	log "adding Port record for $PKGORIGIN (FLAVOR=$FLAVOR FLAVORS=$FLAVORS)"
-	insert_port
+	run_SQL "INSERT INTO Port(PKGORIGIN,PORTNAME,PORTVERSION,DISTVERSION,DISTVERSIONPREFIX,DISTVERSIONSUFFIX,PORTREVISION,MAINTAINER,WWW,FLAVORS) VALUES ($PKGORIGINw,$PORTNAMEw,$PORTVERSIONw,$DISTVERSIONw,$DISTVERSIONPREFIXw,$DISTVERSIONSUFFIXw,$PORTREVISIONw,$MAINTAINERw,$WWWw,$FLAVORSw)"
 	insert_flavor
 else # subsequent flavors
 	log "adding subsequent PortFlavor record for $PKGORIGIN: FLAVOR=$FLAVOR FLAVORS=$FLAVORS PKGBASE=$PKGBASE PKGNAME=$PKGNAME"
@@ -153,3 +167,7 @@ insert_dependencies $PKGORIGIN "$FLAVOR" "$BUILD_DEPENDS" B
 insert_dependencies $PKGORIGIN "$FLAVOR" "$RUN_DEPENDS"   R
 insert_dependencies $PKGORIGIN "$FLAVOR" "$TEST_DEPENDS"  T
 
+# add GitHub records
+if [ -n "$USE_GITHUB" ]; then
+	insert_github
+fi
