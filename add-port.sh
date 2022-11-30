@@ -69,6 +69,10 @@ list_begins_with() {
 escape_special_chars() {
 	echo "$1" | sed -e "s|'|''|g"
 }
+expand_dollar_sign() {
+	echo "$1" | sed -e "s|%%DOLLAR%%|$|g"
+}
+
 
 ##
 ## args
@@ -94,7 +98,7 @@ MAINTAINERw=$(wrap_non_nullable_string "$MAINTAINER")
 WWWw=$(wrap_non_nullable_string "$WWW")
 FLAVORSw=$(wrap_nullable_string "$FLAVORS")
 FLAVORw=$(wrap_non_nullable_string "$FLAVOR")
-COMMENTw=$(wrap_non_nullable_string "$(escape_special_chars "$COMMENT")")
+COMMENTw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$COMMENT")")")
 PKGNAMEw=$(wrap_non_nullable_string "$PKGNAME")
 PKGBASEw=$(wrap_non_nullable_string "$PKGBASE")
 

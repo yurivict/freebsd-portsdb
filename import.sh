@@ -139,7 +139,11 @@ describe_command() {
 	local cmd_args="" # args to supply to add-port.sh
 	for name in FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
 	            MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
-		cmd_args="$cmd_args '@@@{$name}'"
+		if [ $name = "COMMENT" ]; then
+			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
+		else
+			cmd_args="$cmd_args '@@@{$name}'"
+		fi
 	done
 
 	echo "$CODEBASE/add-port.sh '$DB' $cmd_args"
