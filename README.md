@@ -20,3 +20,6 @@ There are only three dependencies:
 * Bourne shell (/bin/sh) which is already present on all systems
 * BSD make which is already present on all systems
 * SQLite database application which can be installed from the 'sqlite3' package
+
+## How to see what's in PortsDB?
+There is an excellent SQLite DB viewer [SQLiteStudio](https://www.sqlitestudio.pl/) that can be installed with ```pkg install SQLiteStudio```.
