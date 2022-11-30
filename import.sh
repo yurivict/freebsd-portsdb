@@ -5,7 +5,7 @@
 
 ##
 ## import.sh is a script that
-## creates the PortsDB SQlite database
+## creates the PortsDB SQLite database
 ## and adds all ports from the ports tree
 ## specified in the PORTSDIR environment
 ## variable.
