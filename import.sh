@@ -123,21 +123,22 @@ create_db() {
 	sqlite3 "$DB" < $CODEBASE/schema.sql
 }
 
+describe_command() {
+	# build DESCRIBE_COMMAND for 'make describe'
+	local cmd_args="" # args to supply to add-port.sh
+	for name in FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
+	            MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do
+		cmd_args="$cmd_args '@@@{$name}'"
+	done
+
+	echo "$CODEBASE/add-port.sh '$DB' $cmd_args"
+}
+
 traverse_ports_tree() {
 	if [ -z "$SINGLE_PORT" ]; then # main branch
-		# build DESCRIBE_COMMAND
-		cmd_args=""
-		for name in FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS; do # args to supply to add-port.sh
-			cmd_args="$cmd_args '@@@{$name}'"
-		done
-		DESCRIBE_COMMAND="$CODEBASE/add-port.sh '$DB' $cmd_args"
-
-		# run
-		(cd $PORTSDIR/$SUBDIR && make describe DESCRIBE_COMMAND="$DESCRIBE_COMMAND" -j $(sysctl -n hw.ncpu))
-	else # for DEBUG only
-		# single port standalone run
+		(cd $PORTSDIR/$SUBDIR && make describe DESCRIBE_COMMAND="$(describe_command)" -j $(sysctl -n hw.ncpu))
+	else # for DEBUG only: single port standalone run
 		(cd $PORTSDIR/$SINGLE_PORT && $CODEBASE/add-port-standalone.sh "$DB")
-
 	fi
 }
 
