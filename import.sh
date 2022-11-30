@@ -96,6 +96,15 @@ async)
 esac
 
 ##
+## check dependency
+##
+
+if [ $(echo $(which sqlite3) | wc -w | sed -e 's| ||g') = 0 ]; then
+	echo "error: sqlite3 dependency is missing"
+	exit 1
+fi
+
+##
 ## functions
 ##
 
