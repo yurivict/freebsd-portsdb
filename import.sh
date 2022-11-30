@@ -99,12 +99,10 @@ esac
 ## check dependency
 ##
 
-for dep in sqlite3; do
-	if [ $(echo $(which $dep) | wc -w | sed -e 's| ||g') = 0 ]; then
-		echo "error: $dep dependency is missing"
-		exit 1
-	fi
-done
+if [ $(echo $(which sqlite3) | wc -w | sed -e 's| ||g') = 0 ]; then
+	echo "error: sqlite3 dependency is missing"
+	exit 1
+fi
 
 ##
 ## functions
