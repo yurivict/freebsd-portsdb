@@ -1,5 +1,5 @@
 # PortsDB
-PortsDB is a program for importing the FreeBSD ports tree into an SQLite database.
+PortsDB is a program for importing of the FreeBSD ports tree into an SQLite database.
 
 ## Purpose
 SQLite is a relational database. In many cases it is easier to query data in a relational database than when the data is in text files.
