@@ -67,7 +67,8 @@ for name in DB \
 	FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
 	MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE \
 	BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
-       	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME ; \
+       	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
+	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT ; \
 do
 	eval "$name=\"$1\""
 	shift
@@ -95,6 +96,12 @@ USE_GITHUBw=$(wrap_non_nullable_string "$USE_GITHUB")
 GH_ACCOUNTw=$(wrap_non_nullable_string "$GH_ACCOUNT")
 GH_PROJECTw=$(wrap_non_nullable_string "$GH_PROJECT")
 GH_TAGNAMEw=$(wrap_non_nullable_string "$GH_TAGNAME")
+
+USE_GITLABw=$(wrap_non_nullable_string "$USE_GITLAB")
+GL_SITEw=$(wrap_non_nullable_string "$GL_SITE")
+GL_ACCOUNTw=$(wrap_non_nullable_string "$GL_ACCOUNT")
+GL_PROJECTw=$(wrap_non_nullable_string "$GL_PROJECT")
+GL_COMMITw=$(wrap_nullable_string "$GL_COMMIT")
 
 ##
 ## DB functions
@@ -148,6 +155,9 @@ insert_dependencies() {
 insert_github() {
 	run_SQL "INSERT INTO GitHub(PKGORIGIN, FLAVOR, USE_GITHUB, GH_ACCOUNT, GH_PROJECT, GH_TAGNAME) VALUES($PKGORIGINw,$FLAVORw,$USE_GITHUBw,$GH_ACCOUNTw,$GH_PROJECTw,$GH_TAGNAMEw)"
 }
+insert_gitlab() {
+	run_SQL "INSERT INTO GitLab(PKGORIGIN, FLAVOR, USE_GITLAB, GL_SITE, GL_ACCOUNT, GL_PROJECT, GL_COMMIT) VALUES($PKGORIGINw,$FLAVORw,$USE_GITLABw,$GL_SITEw,$GL_ACCOUNTw,$GL_PROJECTw,$GL_COMMITw)"
+}
 
 ##
 ## MAIN: insert records into the DB
@@ -167,7 +177,12 @@ insert_dependencies $PKGORIGIN "$FLAVOR" "$BUILD_DEPENDS" B
 insert_dependencies $PKGORIGIN "$FLAVOR" "$RUN_DEPENDS"   R
 insert_dependencies $PKGORIGIN "$FLAVOR" "$TEST_DEPENDS"  T
 
-# add GitHub records
+# add GitHub record
 if [ -n "$USE_GITHUB" ]; then
 	insert_github
+fi
+
+# add GitLab record
+if [ -n "$USE_GITLAB" ]; then
+	insert_gitlab
 fi

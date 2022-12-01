@@ -141,7 +141,8 @@ describe_command() {
 		FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
 		MAINTAINER WWW FLAVORS COMMENT PKGNAME PKGBASE \
 		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
-		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME ; \
+		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
+		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT ; \
 	do
 		if [ $name = "COMMENT" ]; then
 			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
@@ -240,6 +241,7 @@ status_report() {
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM PortFlavor;') flavor records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Depends;') dependency records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitHub;') GitHub records"
+		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitLab;') GitLab records"
 	fi
 }
 
