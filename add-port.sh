@@ -70,7 +70,8 @@ for name in DB \
 	BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
        	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
-	DEPRECATED EXPIRATION_DATE ; \
+	DEPRECATED EXPIRATION_DATE \
+	BROKEN ; \
 do
 	eval "$name=\"$1\""
 	shift
@@ -106,6 +107,7 @@ GL_PROJECTw=$(wrap_non_nullable_string "$GL_PROJECT")
 GL_COMMITw=$(wrap_nullable_string "$GL_COMMIT")
 DEPRECATEDw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$DEPRECATED")")")
 EXPIRATION_DATEw=$(wrap_nullable_string "$EXPIRATION_DATE")
+BROKENw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$BROKEN")")")
 
 ##
 ## DB functions
@@ -165,6 +167,9 @@ insert_gitlab() {
 insert_deprecated() {
 	run_SQL "INSERT INTO Deprecated(PKGORIGIN, FLAVOR, DEPRECATED, EXPIRATION_DATE) VALUES($PKGORIGINw,$FLAVORw,$DEPRECATEDw,$EXPIRATION_DATEw)"
 }
+insert_broken() {
+	run_SQL "INSERT INTO Broken(PKGORIGIN, FLAVOR, BROKEN) VALUES($PKGORIGINw,$FLAVORw,$BROKENw)"
+}
 
 ##
 ## MAIN: insert records into the DB
@@ -197,4 +202,9 @@ fi
 # add Deprecated record
 if [ -n "$DEPRECATED" ]; then
 	insert_deprecated
+fi
+
+# add Broken record
+if [ -n "$BROKEN" ]; then
+	insert_broken
 fi

@@ -144,9 +144,10 @@ describe_command() {
 		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
 		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
-		DEPRECATED EXPIRATION_DATE ; \
+		DEPRECATED EXPIRATION_DATE \
+		BROKEN ; \
 	do
-		if [ $name = "COMMENT" -o $name = "DEPRECATED" ]; then
+		if [ $name = "COMMENT" -o $name = "DEPRECATED" -o $name = "BROKEN" ]; then
 			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
 		else
 			cmd_args="$cmd_args '@@@{$name}'"
@@ -245,6 +246,7 @@ status_report() {
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitHub;') GitHub records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitLab;') GitLab records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Deprecated;') Deprecated records"
+		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Broken;') Broken records"
 	fi
 }
 
