@@ -143,9 +143,10 @@ describe_command() {
 		COMMENT PKGBASE PKGNAME USES \
 		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
 		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
-		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT ; \
+		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
+		DEPRECATED EXPIRATION_DATE ; \
 	do
-		if [ $name = "COMMENT" ]; then
+		if [ $name = "COMMENT" -o $name = "DEPRECATED" ]; then
 			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
 		else
 			cmd_args="$cmd_args '@@@{$name}'"
@@ -243,6 +244,7 @@ status_report() {
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Depends;') dependency records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitHub;') GitHub records"
 		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM GitLab;') GitLab records"
+		echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Deprecated;') Deprecated records"
 	fi
 }
 

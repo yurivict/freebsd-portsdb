@@ -27,7 +27,7 @@ wrap_nullable_integer() {
 	if [ -z "$1" ]; then
 		echo "null"
 	else
-		echo "'$1'"
+		echo "$1"
 	fi
 }
 wrap_non_nullable_integer() {
@@ -69,7 +69,8 @@ for name in DB \
 	COMMENT PKGBASE PKGNAME USES \
 	BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
        	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
-	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT ; \
+	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
+	DEPRECATED EXPIRATION_DATE ; \
 do
 	eval "$name=\"$1\""
 	shift
@@ -98,12 +99,13 @@ USE_GITHUBw=$(wrap_non_nullable_string "$USE_GITHUB")
 GH_ACCOUNTw=$(wrap_non_nullable_string "$GH_ACCOUNT")
 GH_PROJECTw=$(wrap_non_nullable_string "$GH_PROJECT")
 GH_TAGNAMEw=$(wrap_non_nullable_string "$GH_TAGNAME")
-
 USE_GITLABw=$(wrap_non_nullable_string "$USE_GITLAB")
 GL_SITEw=$(wrap_non_nullable_string "$GL_SITE")
 GL_ACCOUNTw=$(wrap_non_nullable_string "$GL_ACCOUNT")
 GL_PROJECTw=$(wrap_non_nullable_string "$GL_PROJECT")
 GL_COMMITw=$(wrap_nullable_string "$GL_COMMIT")
+DEPRECATEDw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$DEPRECATED")")")
+EXPIRATION_DATEw=$(wrap_nullable_string "$EXPIRATION_DATE")
 
 ##
 ## DB functions
@@ -160,6 +162,9 @@ insert_github() {
 insert_gitlab() {
 	run_SQL "INSERT INTO GitLab(PKGORIGIN, FLAVOR, USE_GITLAB, GL_SITE, GL_ACCOUNT, GL_PROJECT, GL_COMMIT) VALUES($PKGORIGINw,$FLAVORw,$USE_GITLABw,$GL_SITEw,$GL_ACCOUNTw,$GL_PROJECTw,$GL_COMMITw)"
 }
+insert_deprecated() {
+	run_SQL "INSERT INTO Deprecated(PKGORIGIN, FLAVOR, DEPRECATED, EXPIRATION_DATE) VALUES($PKGORIGINw,$FLAVORw,$DEPRECATEDw,$EXPIRATION_DATEw)"
+}
 
 ##
 ## MAIN: insert records into the DB
@@ -187,4 +192,9 @@ fi
 # add GitLab record
 if [ -n "$USE_GITLAB" ]; then
 	insert_gitlab
+fi
+
+# add Deprecated record
+if [ -n "$DEPRECATED" ]; then
+	insert_deprecated
 fi
