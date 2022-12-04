@@ -3,7 +3,7 @@
 # Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
 
 
-set -e
+set -euo pipefail
 
 ##
 ## functions

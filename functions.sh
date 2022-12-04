@@ -2,6 +2,13 @@
 
 # Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
 
+
+##
+## set strict mode
+##
+
+set -euo pipefail
+
 ##
 ## functions.sh module is a library of functions used by programs
 ##

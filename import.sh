@@ -67,7 +67,15 @@ if [ -n "$SUBDIR" ] && ! [ -f "$PORTSDIR/$SUBDIR/Makefile" ]; then
 	usage
 	exit 1
 fi
+if [ -z "$SUBDIR" ]; then
+	SUBDIR=""
+fi
 
+if [ -z "$SINGLE_PORT" ]; then
+	SINGLE_PORT=""
+fi
+
+# set defaults
 if [ -z "$DB" -a -z "$SQL_FILE" ]; then
 	# no DB or SQL file is supplied, default to ports.sqlite
 	DB="ports.sqlite"
@@ -94,6 +102,12 @@ async)
 	exit 1
 	;;
 esac
+
+##
+## set strict mode
+##
+
+set -euo pipefail
 
 ##
 ## check dependency
