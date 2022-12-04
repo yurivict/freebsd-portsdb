@@ -110,29 +110,7 @@ done
 ## functions
 ##
 
-announcement() {
-	echo "PortsDB is starting to import the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
-}
-
-make_file_path_global() {
-	local path="$1"
-
-	case "$path" in
-	/*)
-		# do nothing
-		echo "$path"
-		;;
-	*)
-		# make path global
-		echo "$(pwd)/$path"
-		;;
-	esac
-}
-
-create_db() {
-	rm -f "$DB"
-	sqlite3 "$DB" < $CODEBASE/schema.sql
-}
+. $CODEBASE/functions.sh
 
 describe_command() {
 	# build DESCRIBE_COMMAND for 'make describe'
@@ -164,14 +142,6 @@ traverse_ports_tree() {
 		(cd $PORTSDIR/$SUBDIR && make describe DESCRIBE_COMMAND="$(describe_command)" -j $(sysctl -n hw.ncpu))
 	else # for DEBUG only: single port standalone run
 		(cd $PORTSDIR/$SINGLE_PORT && $CODEBASE/add-port-standalone.sh "$DB")
-	fi
-}
-
-check_fk_violations() {
-	local violations=$(sqlite3 "$DB" "PRAGMA foreign_key_check;")
-	if [ -n "$violations" ]; then
-		echo "warning: database has $(sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g') foreign key violation(s)"
-		echo "info: foreign key violations are most likely due to missing flavors in some Python ports, due"
 	fi
 }
 
@@ -276,7 +246,7 @@ export WRITE_MODE
 ##
 
 # announcement
-announcement
+announcement "starting to import"
 
 # initialize
 initialize
