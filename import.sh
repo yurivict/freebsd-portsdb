@@ -22,7 +22,11 @@
 ## - SINGLE_PORT (optional, DEBUG) run on one port, generally produces a broken DB with foreign key violations
 ##
 
-set -e
+##
+## set strict mode
+##
+
+set -euo pipefail
 
 ##
 ## find CODEBASE
@@ -32,13 +36,27 @@ SCRIPT=$(readlink -f "$0")
 CODEBASE=$(dirname "$SCRIPT")
 
 ##
+## include functions library
+##
+
+. $CODEBASE/functions.sh
+
+##
 ## read arguments
 ##
 
-DB="$1" # write the SQLite DB
-SQL_FILE="$2" # save SQL statements into this file, if set
-SQL_FILE_ARG="$SQL_FILE"
-WRITE_MODE="$3" # 'sync'/'async'
+DB=${1-} # write the SQLite DB
+SQL_FILE=${2-} # save SQL statements into this file, if set
+SQL_FILE_ARG="${SQL_FILE}"
+WRITE_MODE=${3-} # 'sync'/'async'
+
+##
+## read env variables
+##
+
+PORTSDIR=${PORTSDIR-/usr/ports} # default value
+SUBDIR=${SUBDIR-}
+SINGLE_PORT=${SINGLE_PORT-}
 
 ##
 ## usage
@@ -52,11 +70,7 @@ usage() {
 ## check arguments and required enviroment values
 ##
 
-if [ -z "$PORTSDIR" ]; then
-	PORTSDIR="/usr/ports" # default value
-fi
-
-if ! [ -f "$PORTSDIR/Makefile" -a -f "$PORTSDIR/Mk/bsd.port.mk" ]; then
+if ! is_ports_tree_directory $PORTSDIR; then
 	echo "error: the PORTSDIR environment variable should point to a valid ports tree"
 	usage
 	exit 1
@@ -66,13 +80,6 @@ if [ -n "$SUBDIR" ] && ! [ -f "$PORTSDIR/$SUBDIR/Makefile" ]; then
 	echo "error: the SUBDIR environment variable is expected to point to a valid subdirectory in the ports tree"
 	usage
 	exit 1
-fi
-if [ -z "$SUBDIR" ]; then
-	SUBDIR=""
-fi
-
-if [ -z "$SINGLE_PORT" ]; then
-	SINGLE_PORT=""
 fi
 
 # set defaults
@@ -104,12 +111,6 @@ async)
 esac
 
 ##
-## set strict mode
-##
-
-set -euo pipefail
-
-##
 ## check dependency
 ##
 
@@ -121,35 +122,8 @@ for dep in sqlite3 git; do
 done
 
 ##
-## functions
+## local functions
 ##
-
-. $CODEBASE/functions.sh
-
-describe_command() {
-	# build DESCRIBE_COMMAND for 'make describe'
-	local cmd_args="" # args to supply to add-port.sh
-	for name in \
-		FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
-		MAINTAINER WWW \
-		COMPLETE_OPTIONS_LIST OPTIONS_DEFAULT \
-		FLAVORS \
-		COMMENT PKGBASE PKGNAME USES \
-		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
-		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
-		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
-		DEPRECATED EXPIRATION_DATE \
-		BROKEN ; \
-	do
-		if [ $name = "COMMENT" -o $name = "DEPRECATED" -o $name = "BROKEN" ]; then
-			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
-		else
-			cmd_args="$cmd_args '@@@{$name}'"
-		fi
-	done
-
-	echo "$CODEBASE/add-port.sh '$DB' $cmd_args"
-}
 
 traverse_ports_tree() {
 	if [ -z "$SINGLE_PORT" ]; then # main branch

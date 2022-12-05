@@ -13,6 +13,11 @@ set -euo pipefail
 ## functions.sh module is a library of functions used by programs
 ##
 
+is_ports_tree_directory() {
+	local PD="$1"
+	[ -f "$PD/Makefile" -a -f "$PD/Mk/bsd.port.mk" -a -d "$PD/.git" ]
+}
+
 announcement() {
 	local action="$1"
 	echo "PortsDB is $action the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
@@ -31,6 +36,31 @@ make_file_path_global() {
 		echo "$(pwd)/$path"
 		;;
 	esac
+}
+
+describe_command() {
+	# build DESCRIBE_COMMAND for 'make describe'
+	local cmd_args="" # args to supply to add-port.sh
+	for name in \
+		FLAVOR PKGORIGIN PORTNAME PORTVERSION DISTVERSION DISTVERSIONPREFIX DISTVERSIONSUFFIX PORTREVISION \
+		MAINTAINER WWW \
+		COMPLETE_OPTIONS_LIST OPTIONS_DEFAULT \
+		FLAVORS \
+		COMMENT PKGBASE PKGNAME USES \
+		BUILD_DEPENDS RUN_DEPENDS TEST_DEPENDS \
+		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
+		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
+		DEPRECATED EXPIRATION_DATE \
+		BROKEN ; \
+	do
+		if [ $name = "COMMENT" -o $name = "DEPRECATED" -o $name = "BROKEN" ]; then
+			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
+		else
+			cmd_args="$cmd_args '@@@{$name}'"
+		fi
+	done
+
+	echo "$CODEBASE/add-port.sh '$DB' $cmd_args"
 }
 
 create_db() {
