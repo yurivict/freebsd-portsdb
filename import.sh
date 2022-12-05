@@ -113,7 +113,7 @@ set -euo pipefail
 ## check dependency
 ##
 
-for dep in sqlite3; do
+for dep in sqlite3 git; do
 	if [ $(echo $(which $dep) | wc -w | sed -e 's| ||g') = 0 ]; then
 		echo "error: $dep dependency is missing"
 		exit 1
@@ -273,6 +273,9 @@ finalize
 
 # remove temp file
 delete_temp_file
+
+# save Git revision of the ports tree
+write_ports_tree_revision
 
 # status report
 status_report

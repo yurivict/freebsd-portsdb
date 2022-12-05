@@ -45,3 +45,18 @@ check_fk_violations() {
 		echo "info: foreign key violations are most likely due to missing flavors in some Python ports, due"
 	fi
 }
+
+get_current_ports_tree_revision() {
+	(cd $PORTSDIR && git rev-parse HEAD)
+}
+
+save_ports_tree_revision() {
+	local revision=$1
+	sqlite3 "$DB" "INSERT into PortsTreeRevision(UPDATE_TIMESTAMP, GIT_HASH) VALUES(DATETIME('now'), '$revision');"
+}
+
+write_ports_tree_revision() {
+	local revision
+	revision=$(get_current_ports_tree_revision)
+	save_ports_tree_revision $revision
+}

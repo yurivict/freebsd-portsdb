@@ -16,10 +16,11 @@ A variety of applications can easily run SQL queries against the PortsDB databas
 * any other similar applications
 
 ## What software does PortsDB depend on?
-There are only three dependencies:
+There are only four dependencies:
 * Bourne shell (/bin/sh) which is already present on all systems
 * BSD make which is already present on all systems
 * SQLite database application which can be installed from the 'sqlite3' package
+* git program
 
 ## How to see what's in PortsDB?
 There is an excellent SQLite DB viewer [SQLiteStudio](https://www.sqlitestudio.pl/) that can be installed with ```pkg install SQLiteStudio```.
