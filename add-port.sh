@@ -3,11 +3,17 @@
 # Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
 
 
+##
+## set strict mode
+##
+
 set -euo pipefail
 
 ##
 ## functions
 ##
+
+. $CODEBASE/functions-sql.sh
 
 log() {
 	#echo "add-port.sh: $1"
@@ -117,19 +123,6 @@ BROKENw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars
 ## DB functions
 ##
 
-run_SQL() {
-	local SQL="$1"
-
-	# execute synchronously
-	if [ -n "$DB" -a "$WRITE_MODE" = "sync" ]; then
-		sqlite3 -cmd '.timeout 50000' $DB "$SQL"
-	fi
-
-	# save SQL statements into a file
-	if [ -n "$SQL_FILE" ]; then
-		echo "$SQL;" >> "$SQL_FILE"
-	fi
-}
 insert_port() {
 	run_SQL "INSERT INTO Port(PKGORIGIN,PORTNAME,PORTVERSION,DISTVERSION,DISTVERSIONPREFIX,DISTVERSIONSUFFIX,PORTREVISION,MAINTAINER,WWW,COMPLETE_OPTIONS_LIST,OPTIONS_DEFAULT,FLAVORS) VALUES ($PKGORIGINw,$PORTNAMEw,$PORTVERSIONw,$DISTVERSIONw,$DISTVERSIONPREFIXw,$DISTVERSIONSUFFIXw,$PORTREVISIONw,$MAINTAINERw,$WWWw,$COMPLETE_OPTIONS_LISTw,$OPTIONS_DEFAULTw,$FLAVORSw)"
 }

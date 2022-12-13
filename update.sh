@@ -4,15 +4,15 @@
 
 
 ##
-## import.sh is a script that
-## creates the PortsDB SQLite database
+## update.sh is a script that
+## updates the PortsDB SQLite database
 ## and adds all ports from the ports tree
 ## specified in the PORTSDIR environment
 ## variable.
 ##
 ##
 ## Arguments:
-## - DB:         (optional) database file to be created (default: ports.sqlite)
+## - DB:         (optional) database file to be updated (default: ports.sqlite)
 ## - SQL_FILE:   (optional) file to write the SQL dump from which the database can be recreated
 ##
 ## Environment variables:
@@ -38,7 +38,7 @@ CODEBASE=$(dirname "$SCRIPT")
 ##
 
 . $CODEBASE/functions.sh
-. $CODEBASE/functions-import.sh
+. $CODEBASE/functions-update.sh
 . $CODEBASE/functions-sql.sh
 . $CODEBASE/params.sh
 
@@ -46,7 +46,7 @@ CODEBASE=$(dirname "$SCRIPT")
 ## read arguments and set defaults
 ##
 
-DB=${1-} # write the SQLite DB (do not write DB when empty)
+DB=${1:-ports.sqlite} # write the SQLite DB
 SQL_FILE=${2-} # save SQL statements into this file, if set
 SQL_FILE_ARG="${SQL_FILE}"
 
@@ -62,6 +62,9 @@ SUBDIR=${SUBDIR-}
 ##
 
 PORTSDIR_EFFECTIVE=""
+UPDATED=no
+UPDATED_PKGORIGIN_COUNT=0
+UPDATED_FROM_REVISION=""
 PERFORM_ACTION_WRITE_DB=no
 PERFORM_ACTION_WRITE_SQL=no
 
@@ -80,20 +83,14 @@ usage() {
 }
 
 ##
-## set defaults
-##
-
-if [ -z "$DB" -a -z "$SQL_FILE" ]; then
-	# no DB or SQL file is supplied, default to ports.sqlite
-	DB="ports.sqlite"
-fi
-
-##
 ## what do we do
 ##
 
-[ -n "$DB" ] && PERFORM_ACTION_WRITE_DB=yes
-[ -n "$SQL_FILE_ARG" ] && PERFORM_ACTION_WRITE_FILE=yes
+if [ -z "$SQL_FILE_ARG" ]; then # update.sh only writes either DB or SQL, but not both
+	PERFORM_ACTION_WRITE_DB=yes
+else
+	PERFORM_ACTION_WRITE_FILE=yes
+fi
 
 ##
 ## check arguments and required enviroment values
@@ -109,8 +106,7 @@ if [ -n "$SUBDIR" ] && ! [ -f "$PORTSDIR/$SUBDIR/Makefile" ]; then
 	usage
 fi
 
-
-# create the file for SQL statements that will be written after traversing the ports tree
+# database will be written after traversing the ports tree
 if [ -z "$SQL_FILE" ]; then
 	# generate temporary SQL file if not provided by the user
 	SQL_FILE=$(mktemp /tmp/ports.sql.XXXXXX)
@@ -124,9 +120,7 @@ PORTSDIR=$(make_file_path_global $PORTSDIR)
 if [ -n "$DB" ]; then
 	DB=$(make_file_path_global "$DB")
 fi
-if [ -n "$SQL_FILE" ]; then
-	SQL_FILE=$(make_file_path_global "$SQL_FILE")
-fi
+SQL_FILE=$(make_file_path_global "$SQL_FILE")
 
 ##
 ## save arguments and other values in environment
@@ -141,18 +135,21 @@ export CODEBASE
 ##
 
 # announcement and action explanation
-announcement "starting to import"
+announcement "starting to update"
 explain_action
+
+# validate DB
+db_validate "$DB" || fail "error: DB file '$DB' doesn't exist or isn't a valid SQLite database file"
 
 # initialize
 initialize
 
-# traverse
+# update
 PORTSDIR_EFFECTIVE=$(effective_ports_tree $PORTSDIR)
-ports_tree_traverse $PORTSDIR_EFFECTIVE "$SUBDIR"
+update $PORTSDIR_EFFECTIVE "$SUBDIR"
 
 # save Git revision of the ports tree
-write_ports_tree_revision $PORTSDIR "imported ports tree revision $(ports_tree_get_current_revision $PORTSDIR)"
+[ $UPDATED = yes ] && write_ports_tree_revision $PORTSDIR "updated ports tree for revisions $UPDATED_FROM_REVISION..$(ports_tree_get_current_revision $PORTSDIR)"
 
 # finalize
 finalize
@@ -161,6 +158,6 @@ finalize
 delete_temp_files
 
 # status report
-status_report
+[ $UPDATED = yes ] && status_report
 
 exit 0

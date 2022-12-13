@@ -1,0 +1,27 @@
+diff --git a/Mk/bsd.port.mk b/Mk/bsd.port.mk
+index 1600ed176739..cf10d5e871dc 100644
+--- a/Mk/bsd.port.mk
++++ b/Mk/bsd.port.mk
+@@ -4287,6 +4287,10 @@ create-manifest:
+ 			${PKG_NOTES_ENV}                                      \
+ 			${SH} ${SCRIPTSDIR}/create-manifest.sh
+ 
++.if defined(DESCRIBE_COMMAND)
++_DESCRIBE_COMMAND_EXPANDED_1:=	${DESCRIBE_COMMAND:S/'/%%%/g:S/@@@/\$/g} # shadow quotes in the supplied command, substitute dollar signs
++_DESCRIBE_COMMAND_EXPANDED:=	${_DESCRIBE_COMMAND_EXPANDED_1:S/'/'\''/g:S/`/\`/g:S/(/\(/g:S/)/\)/g:S/"/\"/g:S/%%%/'/g} # escape quotes, braces in the expanded strings, restore shadowed quotes from the supplied command
++.endif
+ 
+ # Print out package names.
+ 
+@@ -4361,7 +4365,11 @@ INDEX_OUT=/dev/stdout
+ 
+ .      if empty(FLAVORS) || defined(_DESCRIBE_WITH_FLAVOR)
+ describe:
++.        if !defined(DESCRIBE_COMMAND)
+ 	@(${ECHO_CMD} "${PKGNAME}|${.CURDIR}|${PREFIX}|"${COMMENT:Q}"|${_DESCR}|${MAINTAINER}|${CATEGORIES}|${_EXTRACT_DEPENDS}|${_PATCH_DEPENDS}|${_FETCH_DEPENDS}|${_BUILD_DEPENDS:O:u}|${_RUN_DEPENDS:O:u}|${_WWW}" >> ${INDEX_OUT})
++.        else
++	@${_DESCRIBE_COMMAND_EXPANDED}
++.        endif
+ .      else # empty(FLAVORS)
+ describe: ${FLAVORS:S/^/describe-/}
+ .        for f in ${FLAVORS}
