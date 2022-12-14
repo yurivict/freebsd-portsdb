@@ -141,18 +141,24 @@ insert_dependencies() {
 	for DEP in $DEPENDS; do
 		local PARENT_PKGORIGIN=""
 		local PARENT_FLAVOR=""
-		for D in $(echo $DEP | sed -e 's|.*:||; s|@| |'); do
-			if [ -z "$PARENT_PKGORIGIN" ]; then
-				PARENT_PKGORIGIN=$D
-			else
-				PARENT_FLAVOR=$D
-			fi
-		done
+                local PARENT_PHASE=""
 
+		# parse dependency expression into shell expression
+		# the format is ({pkg_ver_spec}|{exe}|{shlib}):{pkgorigin}(|:{parent_stage})(|@{parent_flavor}) - it has 4 parts, out of which 1 part is ignored, and 2 are optional
+		local expression
+                expression=$(echo $DEP | gsed -E 's/([^:@]+):([^:@]+)(|:([a-z]+))(|@([a-zA-Z0-9_]+))$/PARENT_PKGORIGIN=\2;PARENT_FLAVOR=\6;PARENT_PHASE=\4/')
+		# expression wouldn't be equal to $DEP in case the above regex would fail to match the string, and the next line would fail
+
+		# evaluate shell expression
+		eval $expression
+
+		# wrap values
 		local PARENT_PKGORIGINw=$(wrap_non_nullable_string "$PARENT_PKGORIGIN")
 		local PARENT_FLAVORw=$(wrap_non_nullable_string "$PARENT_FLAVOR")
+		local PARENT_PHASEw=$(wrap_nullable_string "$PARENT_PHASE")
 
-		run_SQL "INSERT OR IGNORE INTO Depends(PARENT_PKGORIGIN,PARENT_FLAVOR,CHILD_PKGORIGIN,CHILD_FLAVOR,KIND) VALUES($PARENT_PKGORIGINw,$PARENT_FLAVORw,$CHILD_PKGORIGINw,$CHILD_FLAVORw,'$KIND')"
+		# write into DB
+		run_SQL "INSERT OR IGNORE INTO Depends(PARENT_PKGORIGIN,PARENT_FLAVOR,PARENT_PHASE,CHILD_PKGORIGIN,CHILD_FLAVOR,KIND) VALUES($PARENT_PKGORIGINw,$PARENT_FLAVORw,$PARENT_PHASEw,$CHILD_PKGORIGINw,$CHILD_FLAVORw,'$KIND')"
 	done
 }
 insert_github() {

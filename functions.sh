@@ -36,7 +36,7 @@ is_ports_tree_directory() {
 check_dependencies() {
 	local res=0
 
-	for dep in sqlite3 git; do
+	for dep in sqlite3 git gsed cat sysctl; do
 		if [ $(echo $(which $dep) | wc -w | sed -e 's| ||g') = 0 ]; then
 			perror "error: $dep dependency is missing"
 			res=1

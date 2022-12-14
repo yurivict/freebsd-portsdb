@@ -26,6 +26,7 @@ CREATE TABLE PortFlavor(
 CREATE TABLE Depends(
 	PARENT_PKGORIGIN     TEXT NOT NULL,
 	PARENT_FLAVOR        TEXT NOT NULL,
+	PARENT_PHASE         TEXT NULL, -- there can't be multiple phases for the same combination of other fields, so it isn't included in PK
 	CHILD_PKGORIGIN      TEXT NOT NULL,
 	CHILD_FLAVOR         TEXT NOT NULL,
 	KIND                 CHAR NOT NULL,
