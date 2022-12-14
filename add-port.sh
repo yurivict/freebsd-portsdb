@@ -75,7 +75,7 @@ for name in DB \
 	COMPLETE_OPTIONS_LIST OPTIONS_DEFAULT \
 	FLAVORS \
 	COMMENT PKGBASE PKGNAME USES \
-	BUILD_DEPENDS LIB_DEPENDS RUN_DEPENDS TEST_DEPENDS \
+	PKG_DEPENDS FETCH_DEPENDS EXTRACT_DEPENDS PATCH_DEPENDS BUILD_DEPENDS LIB_DEPENDS RUN_DEPENDS TEST_DEPENDS \
        	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
 	DEPRECATED EXPIRATION_DATE \
@@ -182,10 +182,14 @@ else # subsequent flavors
 fi
 
 # add dependency records
-insert_dependencies $PKGORIGIN "$FLAVOR" "$BUILD_DEPENDS" B
-insert_dependencies $PKGORIGIN "$FLAVOR" "$LIB_DEPENDS"   L
-insert_dependencies $PKGORIGIN "$FLAVOR" "$RUN_DEPENDS"   R
-insert_dependencies $PKGORIGIN "$FLAVOR" "$TEST_DEPENDS"  T
+insert_dependencies $PKGORIGIN "$FLAVOR" "$PKG_DEPENDS"     G
+insert_dependencies $PKGORIGIN "$FLAVOR" "$FETCH_DEPENDS"   F
+insert_dependencies $PKGORIGIN "$FLAVOR" "$EXTRACT_DEPENDS" E
+insert_dependencies $PKGORIGIN "$FLAVOR" "$PATCH_DEPENDS"   P
+insert_dependencies $PKGORIGIN "$FLAVOR" "$BUILD_DEPENDS"   B
+insert_dependencies $PKGORIGIN "$FLAVOR" "$LIB_DEPENDS"     L
+insert_dependencies $PKGORIGIN "$FLAVOR" "$RUN_DEPENDS"     R
+insert_dependencies $PKGORIGIN "$FLAVOR" "$TEST_DEPENDS"    T
 
 # add GitHub record
 if [ -n "$USE_GITHUB" ]; then
