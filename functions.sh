@@ -209,7 +209,7 @@ git_diff_revisions_to_pkgorigin() { # returns list of changed pkgorigins between
 	[ -n "$SUBDIR" -a $SUBDIR != . ] && subdir_term="-- $SUBDIR"
 
 	(cd $PD &&
-		git log --pretty=format: --name-only $rev1..$rev2 $subdir_term |
+		git diff-tree --no-commit-id --name-only -r $rev1..$rev2 $subdir_term |
 		grep -E "^[^/]+/[^/]+/.*" |
 		sed -E "s|^([^/]+/[^/]+)/.*|\1|" |
 		grep -v "^Mk/" |
