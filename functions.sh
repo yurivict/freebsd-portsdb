@@ -142,7 +142,7 @@ db_delete_pkgorigin_sql() {
 }
 
 db_read_last_ports_tree_revision() {
-	sqlite3 "$DB" "SELECT GIT_HASH FROM PortsTreeRevision ORDER BY UPDATE_TIMESTAMP DESC LIMIT 1;"
+	sqlite3 "$DB" "SELECT GIT_HASH FROM RevisionLog ORDER BY UPDATE_TIMESTAMP DESC LIMIT 1;"
 }
 
 db_check_fk_violations() {
@@ -185,7 +185,7 @@ ports_tree_traverse() {
 save_ports_tree_revision() {
 	local revision=$1
 	local comment="$2"
-	run_SQL "INSERT into PortsTreeRevision(UPDATE_TIMESTAMP, GIT_HASH, COMMENT) VALUES(DATETIME('now'), '$revision', '$comment');"
+	run_SQL "INSERT into RevisionLog(UPDATE_TIMESTAMP, GIT_HASH, COMMENT) VALUES(DATETIME('now'), '$revision', '$comment');"
 }
 
 write_ports_tree_revision() {
