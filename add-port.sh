@@ -136,7 +136,7 @@ insert_dependencies() {
 	local KIND="$4"
 
 	local CHILD_PKGORIGINw=$(wrap_non_nullable_string "$PKGORIGIN")
-	local CHILD_FLAVORw=$(wrap_nullable_string "$FLAVOR")
+	local CHILD_FLAVORw=$(wrap_non_nullable_string "$FLAVOR")
 
 	for DEP in $DEPENDS; do
 		local PARENT_PKGORIGIN=""
@@ -150,7 +150,7 @@ insert_dependencies() {
 		done
 
 		local PARENT_PKGORIGINw=$(wrap_non_nullable_string "$PARENT_PKGORIGIN")
-		local PARENT_FLAVORw=$(wrap_nullable_string "$PARENT_FLAVOR")
+		local PARENT_FLAVORw=$(wrap_non_nullable_string "$PARENT_FLAVOR")
 
 		run_SQL "INSERT OR IGNORE INTO Depends(PARENT_PKGORIGIN,PARENT_FLAVOR,CHILD_PKGORIGIN,CHILD_FLAVOR,KIND) VALUES($PARENT_PKGORIGINw,$PARENT_FLAVORw,$CHILD_PKGORIGINw,$CHILD_FLAVORw,'$KIND')"
 	done
