@@ -6,6 +6,7 @@ SQLite is a relational database. In many cases it is easier to query data in a r
 
 ## How to use PortsDB
 Just run the command './import.sh' on a FreeBSD system. It will run for several minutes and will create the database 'ports.sqlite'.
+Then you can update your ports tree and run './update.sh', which will update the database with all new commits.
 
 ## What to do with the database produced by PortsDB?
 A variety of applications can easily run SQL queries against the PortsDB database to
@@ -16,11 +17,12 @@ A variety of applications can easily run SQL queries against the PortsDB databas
 * any other similar applications
 
 ## What software does PortsDB depend on?
-There are only four dependencies:
+There are only few dependencies:
 * Bourne shell (/bin/sh) which is already present on all systems
 * BSD make which is already present on all systems
 * SQLite database application which can be installed from the 'sqlite3' package
 * git program
+* gsed program
 
 ## How to see what's in PortsDB?
 There is an excellent SQLite DB viewer [SQLiteStudio](https://www.sqlitestudio.pl/) that can be installed with ```pkg install SQLiteStudio```.
