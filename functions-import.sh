@@ -29,6 +29,7 @@ initialize() {
 
 finalize() {
 	# end the SQL file
+	cat $CODEBASE/sqls/fix-default-parent-flavor.sql >> "$SQL_FILE"
 	echo "-- end of file" >> "$SQL_FILE"
 
 	# create DB from the bulk SQL
