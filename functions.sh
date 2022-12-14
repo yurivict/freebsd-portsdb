@@ -151,7 +151,7 @@ db_check_fk_violations() {
 	violations=$(sqlite3 "$DB" "PRAGMA foreign_key_check;")
 	if [ -n "$violations" ]; then
 		echo "warning: database has $(sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g') foreign key violation(s)"
-		echo "info: foreign key violations are most likely due to missing flavors in some Python ports, due"
+		echo "info: foreign key violations are most likely due to missing flavors in some Python ports"
 	fi
 }
 
