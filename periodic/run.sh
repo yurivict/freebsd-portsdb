@@ -79,7 +79,12 @@ fi
 	echo "---end git log---"
 
 	# update
+	DB_SHA256=$(sha256 -q ports.sqlite)
 	PORTSDIR=$PORTSDIR $PORTDSB_UPDATE_CMD
+	if [ "$(sha256 -q ports.sqlite)" = $DB_SHA256 ]; then
+		echo "no updates: git commits didn't update any pkgorigins"
+		exit 0
+	fi
 
 	# upload
 	echo "uploading ports.sqlite with sha256=$(sha256 -q ports.sqlite) ..."
