@@ -37,9 +37,9 @@ CODEBASE=$(dirname "$SCRIPT")
 ## include function libraries and read parameters
 ##
 
-. $CODEBASE/functions.sh
-. $CODEBASE/functions-import.sh
-. $CODEBASE/functions-sql.sh
+. $CODEBASE/include/functions.sh
+. $CODEBASE/include/functions-import.sh
+. $CODEBASE/include/functions-sql.sh
 . $CODEBASE/params.sh
 
 ##

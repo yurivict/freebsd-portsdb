@@ -13,7 +13,7 @@ set -euo pipefail
 ## functions
 ##
 
-. $CODEBASE/functions-sql.sh
+. $CODEBASE/include/functions-sql.sh
 
 log() {
 	#echo "add-port.sh: $1"
