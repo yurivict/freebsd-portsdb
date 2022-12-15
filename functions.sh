@@ -210,12 +210,12 @@ git_diff_revisions_to_pkgorigin() { # returns list of changed pkgorigins between
 
 	(cd $PD &&
 		git diff-tree --no-commit-id --name-only -r $rev1..$rev2 $subdir_term |
-		grep -E "^[^/]+/[^/]+/.*" |
-		sed -E "s|^([^/]+/[^/]+)/.*|\1|" |
-		grep -v "^Mk/" |
+		(grep -E "^[^/]+/[^/]+/.*" || true) |
+		(sed -E "s|^([^/]+/[^/]+)/.*|\1|" || true) |
+		(grep -v "^Mk/" || true) |
 		sort |
 		uniq
-	)
+	) || fail "git_diff_revisions_to_pkgorigin pipe failed"
 }
 
 ## SQL file handling

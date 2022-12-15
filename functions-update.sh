@@ -35,8 +35,7 @@ update() {
 	old_revision=$(db_read_last_ports_tree_revision)
 	new_revision=$(ports_tree_get_current_revision $PD)
 	if [ -z "$old_revision" -o -z "$new_revision" ]; then
-		echo "invalid revision" # this should never happen
-		exit 1
+		fail "invalid revision" # this should never happen
 	fi
 
 	# any updates?
@@ -58,6 +57,12 @@ update() {
 		fi
 	done
 	num=$((num-1))
+
+	# report if there are no pkgorigin updates
+	[ $num = 0 ] &&
+		echo "no pkgorigin updates were found" &&
+		echo "... between ports tree revisions $old_revision..$new_revision" &&
+		echo "... last revision in DB will still be updated"
 
 	# update
 	local n=1
