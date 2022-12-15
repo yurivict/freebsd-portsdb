@@ -74,7 +74,7 @@ patch_ports_tree() {
 	rm $PD_PATCHED # we will create the directory instead of this file
 
 	# copy
-	$CODEBASE/copy-tree.sh $PD_ORIGINAL $PD_PATCHED
+	$CODEBASE/util/copy-tree.sh $PD_ORIGINAL $PD_PATCHED
 	# patch
 	(cd $PD_PATCHED && patch -p 1 --quiet < $CODEBASE/patches/Mk-portsdb.patch >&2) || exit 1
 
