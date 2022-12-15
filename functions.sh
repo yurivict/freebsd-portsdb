@@ -120,7 +120,7 @@ describe_command() {
 
 db_create() {
 	rm -f "$DB"
-	sqlite3 "$DB" < $CODEBASE/schema.sql
+	sqlite3 "$DB" < $CODEBASE/sql/schema.sql
 }
 
 db_validate() {
@@ -234,7 +234,7 @@ sql_file_begin() {
 
 		if [ $with_schema = 1 ]; then
 			echo "-- schema"
-			cat $CODEBASE/schema.sql
+			cat $CODEBASE/sql/schema.sql
 			echo ""
 		fi
 
