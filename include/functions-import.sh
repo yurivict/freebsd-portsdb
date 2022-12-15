@@ -59,6 +59,7 @@ finalize() {
 
 status_report() {
 	echo "PortsDB has finished to import the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
+
 	if [ $PERFORM_ACTION_WRITE_DB = yes ]; then
 		echo "- PortsDB created the SQLite database $DB"
 		db_print_stats $DB
