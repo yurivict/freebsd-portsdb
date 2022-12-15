@@ -55,6 +55,14 @@ if ! [ -f ports.sqlite ]; then
 	exit 1
 fi
 
+fail() {
+	local msg="$1"
+
+	echo "******ERROR: $msg******" >&2
+
+	exit 1
+}
+
 ##
 ## MAIN
 ##
@@ -67,7 +75,7 @@ fi
 	echo "timestamp(begin): $(date "+%Y-%m-%d %H:%M:%S")"
 
 	# pull
-	(cd $PORTSDIR && git pull) > git-pull.log
+	(cd $PORTSDIR && git pull) > git-pull.log || fail "git pull failed"
 	if [ "$(cat git-pull.log)" = "Already up to date." ]; then
 		echo "no updates: nothing to import into PortsDB"
 		exit 0
@@ -80,7 +88,7 @@ fi
 
 	# update
 	DB_SHA256=$(sha256 -q ports.sqlite)
-	PORTSDIR=$PORTSDIR $PORTDSB_UPDATE_CMD
+	PORTSDIR=$PORTSDIR $PORTDSB_UPDATE_CMD || fail "update command failed"
 	if [ "$(sha256 -q ports.sqlite)" = $DB_SHA256 ]; then
 		echo "no updates: git commits didn't update any pkgorigins"
 		exit 0
@@ -88,7 +96,7 @@ fi
 
 	# upload
 	echo "uploading ports.sqlite with sha256=$(sha256 -q ports.sqlite) ..."
-	$UPLOAD_CMD ports.sqlite
+	$UPLOAD_CMD ports.sqlite || fail "upload command failed"
 
 	# timestamp
 	echo "timestamp(end): $(date "+%Y-%m-%d %H:%M:%S")"
