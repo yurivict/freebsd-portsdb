@@ -27,6 +27,17 @@ initialize() {
 	sql_file_begin "$SQL_FILE" 1 # with schema
 }
 
+import() {
+	local PD=$1
+	local NOBUF="stdbuf -i0 -o0 -e0"
+
+	ports_tree_traverse $PD "$SUBDIR" 2>&1 |
+		$NOBUF grep "^===> " |
+		$NOBUF sed -e 's|===> ||' |
+		$NOBUF $CODEBASE/util/number-lines.sh |
+		$NOBUF $CODEBASE/util/squeeze-log-into-line.sh
+}
+
 finalize() {
 	# end the SQL file
 	cat $CODEBASE/sqls/fix-default-parent-flavor.sql >> "$SQL_FILE"

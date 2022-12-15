@@ -149,7 +149,7 @@ initialize
 
 # traverse
 PORTSDIR_EFFECTIVE=$(effective_ports_tree $PORTSDIR)
-ports_tree_traverse $PORTSDIR_EFFECTIVE "$SUBDIR"
+import $PORTSDIR_EFFECTIVE
 
 # save Git revision of the ports tree
 write_ports_tree_revision $PORTSDIR "imported ports tree revision $(ports_tree_get_current_revision $PORTSDIR)"
