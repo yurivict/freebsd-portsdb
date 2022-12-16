@@ -158,10 +158,14 @@ db_read_last_ports_tree_revision() {
 	sqlite3 "$DB" "SELECT GIT_HASH FROM RevisionLog ORDER BY UPDATE_TIMESTAMP DESC LIMIT 1;"
 }
 
+db_get_fk_violations_count() {
+	sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g'
+}
+
 db_check_fk_violations() {
 	local violations
+	violations=$(db_get_fk_violations_count)
 
-	violations=$(sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g')
 	[ $violations != 0 ] &&
 		echo "warning: database has $violations foreign key $(plural_msg $violations "violation" "violations")" &&
 		echo "info: foreign key violations are most likely due to missing flavors in some Python ports"
@@ -184,14 +188,16 @@ db_print_stats() {
 ports_tree_get_current_revision() {
 	local PD=$1
 
-	(cd $PD && git rev-parse HEAD)
+	(cd $PD && git rev-parse HEAD) \
+		|| fail "git failed while getting current revision"
 }
 
 ports_tree_traverse() {
 	local PD=$1
 	local SUBDIR=$2
 
-	(cd $PD && PORTSDIR=$PD make -I $PD -C $PD/$SUBDIR describe DESCRIBE_COMMAND="$(describe_command)" -j $(sysctl -n hw.ncpu))
+	(cd $PD && PORTSDIR=$PD make -I $PD -C $PD/$SUBDIR describe DESCRIBE_COMMAND="$(describe_command)" -j $(sysctl -n hw.ncpu)) \
+		|| fail "ports tree traversal failed"
 }
 
 save_ports_tree_revision() {
