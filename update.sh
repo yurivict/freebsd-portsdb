@@ -149,7 +149,10 @@ PORTSDIR_EFFECTIVE=$(effective_ports_tree $PORTSDIR)
 update $PORTSDIR_EFFECTIVE "$SUBDIR"
 
 # save Git revision of the ports tree
-[ $UPDATED = yes ] && write_ports_tree_revision $PORTSDIR "updated ports tree for revisions $UPDATED_FROM_REVISION..$(ports_tree_get_current_revision $PORTSDIR)"
+[ $UPDATED = yes ] &&
+	write_ports_tree_revision \
+		$PORTSDIR \
+		"updated ports tree for revisions $UPDATED_FROM_REVISION..$(ports_tree_get_current_revision $PORTSDIR), $UPDATED_PKGORIGIN_COUNT $(plural_msg $UPDATED_PKGORIGIN_COUNT "pkgorigin was" "pkgorigins were") affected"
 
 # finalize
 finalize

@@ -33,6 +33,14 @@ is_ports_tree_directory() {
 	[ -f "$PD/Makefile" -a -f "$PD/Mk/bsd.port.mk" -a -d "$PD/.git" ]
 }
 
+plural_msg() {
+	local N=$1
+	local STR_SINGLE="$2"
+	local STR_PLURAL="$3"
+
+        [ $((N%10)) = 1 -a $((N%100)) != 11 ] && echo $STR_SINGLE || echo $STR_PLURAL
+}
+
 check_dependencies() {
 	local res=0
 
@@ -153,11 +161,10 @@ db_read_last_ports_tree_revision() {
 db_check_fk_violations() {
 	local violations
 
-	violations=$(sqlite3 "$DB" "PRAGMA foreign_key_check;")
-	if [ -n "$violations" ]; then
-		echo "warning: database has $(sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g') foreign key violation(s)"
+	violations=$(sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g')
+	[ $violations != 0 ] &&
+		echo "warning: database has $violations foreign key $(plural_msg $violations "violation" "violations")" &&
 		echo "info: foreign key violations are most likely due to missing flavors in some Python ports"
-	fi
 }
 
 db_print_stats() {

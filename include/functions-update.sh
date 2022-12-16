@@ -106,11 +106,11 @@ status_report() {
 	[ $UPDATED = yes ] && echo "PortsDB has finished to update the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
 
 	if [ $PERFORM_ACTION_WRITE_DB = yes ]; then
-		echo " - PortsDB updated $UPDATED_PKGORIGIN_COUNT pkgorigin(s) in the SQLite database $DB"
+		echo " - PortsDB updated $UPDATED_PKGORIGIN_COUNT $(plural_msg $UPDATED_PKGORIGIN_COUNT "pkgorigin" "pkgorigins") in the SQLite database $DB"
 		db_print_stats $DB
 	fi
 	[ $PERFORM_ACTION_WRITE_SQL = yes ] &&
-		echo " - PortsDB wrote $UPDATED_PKGORIGIN_COUNT pkgorigin(s) updates into the SQL file $SQL_FILE_ARG"
+		echo " - PortsDB wrote $UPDATED_PKGORIGIN_COUNT $(plural_msg $UPDATED_PKGORIGIN_COUNT "pkgorigin" "pkgorigins") updates into the SQL file $SQL_FILE_ARG"
 
 	return 0
 }
