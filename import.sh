@@ -140,8 +140,10 @@ export CODEBASE
 ## MAIN
 ##
 
-# announcement and action explanation
+# announcement
 announcement "starting to import"
+
+# explain
 explain_action
 
 # initialize

@@ -134,8 +134,10 @@ export CODEBASE
 ## MAIN
 ##
 
-# announcement and action explanation
+# announcement
 announcement "starting to update"
+
+# explain
 explain_action
 
 # validate DB
