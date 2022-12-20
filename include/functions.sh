@@ -38,7 +38,7 @@ plural_msg() {
 	local STR_SINGLE="$2"
 	local STR_PLURAL="$3"
 
-        [ $((N%10)) = 1 -a $((N%100)) != 11 ] && echo $STR_SINGLE || echo $STR_PLURAL
+	[ $((N%10)) = 1 -a $((N%100)) != 11 ] && echo $STR_SINGLE || echo $STR_PLURAL
 }
 
 check_dependencies() {
