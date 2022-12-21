@@ -1,0 +1,15 @@
+SELECT
+	P.PKGORIGIN
+FROM
+	Port P
+WHERE
+	EXISTS(
+		SELECT
+			*
+		FROM
+			Depends D
+		WHERE
+			D.PARENT_PKGORIGIN = P.PKGORIGIN
+			AND
+			D.KIND = 'T'
+	)
