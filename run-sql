@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
+
+##
+## run-sql allows users to run prepared SQL statements against PortsDB
+##
+
+##
+## set strict mode
+##
+
+set -euo pipefail
+
+##
+## find CODEBASE
+##
+
+SCRIPT=$(readlink -f "$0")
+CODEBASE=$(dirname "$SCRIPT")
+
+##
+## include functions
+##
+
+. $CODEBASE/include/functions.sh
+
+##
+## find PortsDB
+##
+
+PORTSDB=${PORTSDB:-./ports.sqlite} # default value
+
+[ -f $PORTSDB ] || echo "can't find PortsDB at '$PORTSDB', please set the PORTSDB environment variable"
+
+##
+## arguments
+##
+
+SQL_FILE="$1"
+
+[ -f "$SQL_FILE" ] || fail "supplied argument '$SQL_FILE' isn't a file"
+
+##
+## substitute arguments if any
+##
+
+SQL=$(cat $SQL_FILE)
+shift
+SQL="$(printf "$SQL" "$@")"
+
+##
+## execute query
+##
+
+sqlite3 $PORTSDB "$SQL"
