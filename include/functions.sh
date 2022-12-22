@@ -44,7 +44,7 @@ plural_msg() {
 check_dependencies() {
 	local res=0
 
-	for dep in cat cp date git gsed hostname make patch rm sed sha256 sqlite3 sysctl wc [; do
+	for dep in cat cp date false git grep gsed hostname make mktemp patch printf rm sed sha256 sort sqlite3 sysctl true uniq wc [; do
 		if [ $(echo $(which $dep) | wc -w | sed -e 's| ||g') = 0 ]; then
 			perror "error: $dep dependency is missing"
 			res=1
