@@ -83,7 +83,7 @@ fail() {
 	ANY_UPDATES=no
 
 	# timestamp
-	echo "timestamp(begin): $(date "+%Y-%m-%d %H:%M:%S")"
+	echo "timestamp(begin, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
 
 	# pull
 	(cd $PORTSDIR && git pull) > git-pull.log || fail "git pull failed"
@@ -122,5 +122,5 @@ fail() {
 	fi
 
 	# timestamp
-	echo "timestamp(end): $(date "+%Y-%m-%d %H:%M:%S")"
+	echo "timestamp(end, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
 ) >> portsdb.log 2>&1
