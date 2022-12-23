@@ -63,9 +63,15 @@ db_hash() {
 	sha256 -q ports.sqlite
 }
 
+timestamp() {
+	local location=$1
+	echo "timestamp($location, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
+}
+
 fail() {
 	local msg="$1"
 
+	timestamp "error"
 	echo "******ERROR: $msg******" >&2
 
 	exit 1
@@ -83,10 +89,10 @@ fail() {
 	ANY_UPDATES=no
 
 	# timestamp
-	echo "timestamp(begin, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
+	timestamp "begin"
 
 	# pull
-	(cd $PORTSDIR && git pull) > git-pull.log || fail "git pull failed"
+	(cd $PORTSDIR && git pull) > git-pull.log 2>git-pull.err || fail "git pull failed: $(cat git-pull.err)"
 	if [ "$(cat git-pull.log)" = "Already up to date." ]; then
 		echo "no updates: nothing to import into PortsDB"
 	else
@@ -105,7 +111,7 @@ fail() {
 		# save DB hash
 		DB_HASH=$(db_hash)
 		# actual update
-		PORTSDIR=$PORTSDIR $PORTDSB_UPDATE_CMD || fail "update command failed"
+		(PORTSDIR=$PORTSDIR $PORTDSB_UPDATE_CMD) 2>update.err || fail "update command failed: $(cat update.err)"
 		if [ $(db_hash) = $DB_HASH ]; then
 			echo "no updates: git commits didn't update any pkgorigins"
 			ANY_UPDATES=no
@@ -116,11 +122,11 @@ fail() {
 	if [ $ANY_UPDATES = yes ] || ! [ -f ports.sqlite.sha256 ] || [ "$(cat ports.sqlite.sha256)" != $(db_hash) ]; then
 		echo "uploading ports.sqlite with sha256=$(db_hash) ..."
 		# actual upload
-		$UPLOAD_CMD ports.sqlite || fail "upload command failed"
+		($UPLOAD_CMD ports.sqlite) > upload.log 2>upload.err || fail "upload command failed: $(cat upload.err)"
 		# save last uploaded DB hash
 		echo $(db_hash) > ports.sqlite.sha256
 	fi
 
 	# timestamp
-	echo "timestamp(end, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
+	timestamp "end"
 ) >> portsdb.log 2>&1
