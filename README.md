@@ -24,5 +24,10 @@ There are only few dependencies:
 * git program
 * gsed program
 
+## Design principles
+* *Ease of use:* users only need to run import.sh to import the ports tree into a database. They can also choose to run update.sh to quickly update the database with new commits, instead of re-running import.sh, which takes longer
+* *Performance:* import.sh only takes ~15 minutes, depending on the system.
+* *No artificial keys:* we didn't introduce any external integer keys into tables. Tables are indexed with PKGORIGIN in the form of *{carteg}/{name}* and flavor. This makes tables easy to understand and easy to query.
+
 ## How to see what's in PortsDB?
 There is an excellent SQLite DB viewer [SQLiteStudio](https://www.sqlitestudio.pl/) that can be installed with ```pkg install SQLiteStudio```.
