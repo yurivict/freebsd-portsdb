@@ -1,0 +1,8 @@
+SELECT
+	PKGORIGIN,
+	FLAVOR,
+	COMMENT
+FROM
+	PortFlavor
+WHERE
+	COMMENT like '%%%s%%'
