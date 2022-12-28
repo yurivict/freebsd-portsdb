@@ -2,7 +2,8 @@
 
 # Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
 
-set -euo pipefail
+STRICT="set -euo pipefail"
+$STRICT
 
 ESC=$'\e'
 
@@ -12,6 +13,7 @@ in_terminal=no
 len=0
 
 clr() {
+	$STRICT
 	if [ $len -gt 0 ]; then
 		echo -n "${ESC}[1K" # erase
 		echo -n "${ESC}[${len}D" # backwards

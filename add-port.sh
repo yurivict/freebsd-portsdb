@@ -7,7 +7,8 @@
 ## set strict mode
 ##
 
-set -euo pipefail
+STRICT="set -euo pipefail"
+$STRICT
 
 ##
 ## functions
@@ -16,10 +17,12 @@ set -euo pipefail
 . $CODEBASE/include/functions-sql.sh
 
 log() {
+	$STRICT
 	#echo "add-port.sh: $1"
 }
 
 wrap_nullable_string() {
+	$STRICT
 	if [ -z "$1" ]; then
 		echo "null"
 	else
@@ -27,9 +30,11 @@ wrap_nullable_string() {
 	fi
 }
 wrap_non_nullable_string() {
+	$STRICT
 	echo "'$1'"
 }
 wrap_nullable_integer() {
+	$STRICT
 	if [ -z "$1" ]; then
 		echo "null"
 	else
@@ -37,9 +42,11 @@ wrap_nullable_integer() {
 	fi
 }
 wrap_non_nullable_integer() {
+	$STRICT
 	echo $1
 }
 list_begins_with() {
+	$STRICT
 	local small="$1"
 	local large="$2"
 	local pattern="$small "
@@ -59,9 +66,11 @@ list_begins_with() {
 	esac
 }
 escape_special_chars() {
+	$STRICT
 	echo "$1" | sed -e "s|'|''|g"
 }
 expand_dollar_sign() {
+	$STRICT
 	echo "$1" | sed -e "s|%%DOLLAR%%|$|g"
 }
 
@@ -124,12 +133,15 @@ BROKENw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars
 ##
 
 insert_port() {
+	$STRICT
 	run_SQL "INSERT INTO Port(PKGORIGIN,PORTNAME,PORTVERSION,DISTVERSION,DISTVERSIONPREFIX,DISTVERSIONSUFFIX,PORTREVISION,MAINTAINER,WWW,COMPLETE_OPTIONS_LIST,OPTIONS_DEFAULT,FLAVORS) VALUES ($PKGORIGINw,$PORTNAMEw,$PORTVERSIONw,$DISTVERSIONw,$DISTVERSIONPREFIXw,$DISTVERSIONSUFFIXw,$PORTREVISIONw,$MAINTAINERw,$WWWw,$COMPLETE_OPTIONS_LISTw,$OPTIONS_DEFAULTw,$FLAVORSw)"
 }
 insert_flavor() {
+	$STRICT
 	run_SQL "INSERT INTO PortFlavor(PKGORIGIN,FLAVOR,COMMENT,PKGBASE,PKGNAME,USES) VALUES ($PKGORIGINw,$FLAVORw,$COMMENTw,$PKGBASEw,$PKGNAMEw,$USESw)"
 }
 insert_dependencies() {
+	$STRICT
 	local PKGORIGIN="$1"
 	local FLAVOR="$2"
 	local DEPENDS="$3"
@@ -162,15 +174,19 @@ insert_dependencies() {
 	done
 }
 insert_github() {
+	$STRICT
 	run_SQL "INSERT INTO GitHub(PKGORIGIN, FLAVOR, USE_GITHUB, GH_ACCOUNT, GH_PROJECT, GH_TAGNAME) VALUES($PKGORIGINw,$FLAVORw,$USE_GITHUBw,$GH_ACCOUNTw,$GH_PROJECTw,$GH_TAGNAMEw)"
 }
 insert_gitlab() {
+	$STRICT
 	run_SQL "INSERT INTO GitLab(PKGORIGIN, FLAVOR, USE_GITLAB, GL_SITE, GL_ACCOUNT, GL_PROJECT, GL_COMMIT) VALUES($PKGORIGINw,$FLAVORw,$USE_GITLABw,$GL_SITEw,$GL_ACCOUNTw,$GL_PROJECTw,$GL_COMMITw)"
 }
 insert_deprecated() {
+	$STRICT
 	run_SQL "INSERT INTO Deprecated(PKGORIGIN, FLAVOR, DEPRECATED, EXPIRATION_DATE) VALUES($PKGORIGINw,$FLAVORw,$DEPRECATEDw,$EXPIRATION_DATEw)"
 }
 insert_broken() {
+	$STRICT
 	run_SQL "INSERT INTO Broken(PKGORIGIN, FLAVOR, BROKEN) VALUES($PKGORIGINw,$FLAVORw,$BROKENw)"
 }
 

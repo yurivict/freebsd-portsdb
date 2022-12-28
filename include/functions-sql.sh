@@ -4,16 +4,16 @@
 
 
 ##
-## set strict mode
-##
-
-set -euo pipefail
-
-##
 ## functions (shared between low and high level)
 ##
 
+## set strict mode
+STRICT="set -euo pipefail"
+$STRICT
+
+
 run_SQL() {
+	$STRICT
 	local SQL="$1"
 
 	# save SQL statements into a file

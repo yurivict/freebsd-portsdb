@@ -24,7 +24,8 @@
 ## set strict mode
 ##
 
-set -euo pipefail
+STRICT="set -euo pipefail"
+$STRICT
 
 ##
 ## find CODEBASE
@@ -76,6 +77,7 @@ check_dependencies || fail ""
 ##
 
 usage() {
+	$STRICT
 	fail "Usage: $0 <db.sqlite> <file.sql> [{sync|async}]"
 }
 

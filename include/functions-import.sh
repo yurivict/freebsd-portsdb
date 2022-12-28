@@ -6,10 +6,13 @@
 ## library of functions for the import module
 ##
 
-set -euo pipefail
+## set strict mode
+STRICT="set -euo pipefail"
+$STRICT
 
 
 explain_action() {
+	$STRICT
 	echo "actions that will be performed:"
 	if [ $PERFORM_ACTION_WRITE_DB = yes ]; then
 		echo " - import the ports tree into the database $DB"
@@ -23,11 +26,13 @@ explain_action() {
 }
 
 initialize() {
+	$STRICT
 	# begin the SQL file
 	sql_file_begin "$SQL_FILE" 1 # with schema
 }
 
 import() {
+	$STRICT
 	local PD=$1
 	local NOBUF="stdbuf -i0 -o0 -e0"
 
@@ -39,6 +44,7 @@ import() {
 }
 
 finalize() {
+	$STRICT
 	# end the SQL file
 	cat $CODEBASE/sql/fix-default-parent-flavor.sql >> "$SQL_FILE"
 	echo "-- end of file" >> "$SQL_FILE"
@@ -58,6 +64,7 @@ finalize() {
 }
 
 status_report() {
+	$STRICT
 	echo "PortsDB has finished to import the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
 
 	if [ $PERFORM_ACTION_WRITE_DB = yes ]; then

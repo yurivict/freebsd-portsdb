@@ -12,28 +12,33 @@
 ## set strict mode
 ##
 
-set -euo pipefail
+STRICT="set -euo pipefail"
+$STRICT
 
 
 ## general functions
 
 fail() {
+	$STRICT
 	local msg="$1"
 	[ -n "$msg" ] && echo $msg >&2
 	exit 1
 }
 
 perror() {
+	$STRICT
 	local msg="$1"
 	echo $msg >&2
 }
 
 is_ports_tree_directory() {
+	$STRICT
 	local PD=$1
 	[ -f "$PD/Makefile" -a -f "$PD/Mk/bsd.port.mk" -a -d "$PD/.git" ]
 }
 
 plural_msg() {
+	$STRICT
 	local N=$1
 	local STR_SINGLE="$2"
 	local STR_PLURAL="$3"
@@ -42,6 +47,7 @@ plural_msg() {
 }
 
 check_dependencies() {
+	$STRICT
 	local res=0
 
 	for dep in cat cp date false git grep gsed hostname make mktemp patch printf rm sed sha256 sort sqlite3 sysctl true uniq wc [; do
@@ -55,11 +61,13 @@ check_dependencies() {
 }
 
 announcement() {
+	$STRICT
 	local action="$1"
 	echo "PortsDB is $action the ports tree at $(date "+%Y-%m-%d %H:%M:%S %Z (%z)") on host $(hostname)"
 }
 
 make_file_path_global() {
+	$STRICT
 	local path="$1"
 
 	case "$path" in
@@ -75,6 +83,7 @@ make_file_path_global() {
 }
 
 patch_ports_tree() {
+	$STRICT
 	local PD_ORIGINAL="$1"
 	local PD_PATCHED
 
@@ -95,6 +104,7 @@ patch_ports_tree() {
 }
 
 effective_ports_tree() {
+	$STRICT
 	local PD=$1
 
 	if [ $PARAM_PORTSTREE_NEEDS_PATCHING = yes ]; then
@@ -105,6 +115,7 @@ effective_ports_tree() {
 }
 
 describe_command() {
+	$STRICT
 	# build DESCRIBE_COMMAND for 'make describe'
 	local cmd_args="" # args to supply to add-port.sh
 	for name in \
@@ -132,16 +143,19 @@ describe_command() {
 ## DB-related functions
 
 db_create() {
+	$STRICT
 	rm -f "$DB"
 	sqlite3 "$DB" < $CODEBASE/sql/schema.sql
 }
 
 db_validate() {
+	$STRICT
 	local DB="$1"
 	[ -f "$DB" ] && sqlite3 "$DB" "PRAGMA integrity_check;" > /dev/null 2>&1
 }
 
 db_delete_pkgorigin_sql() {
+	$STRICT
 	local pkgorigin=$1
 	local SQL=""
 	SQL="${SQL}DELETE FROM Broken WHERE PKGORIGIN='$pkgorigin';\n"
@@ -155,14 +169,17 @@ db_delete_pkgorigin_sql() {
 }
 
 db_read_last_ports_tree_revision() {
+	$STRICT
 	sqlite3 "$DB" "SELECT GIT_HASH FROM RevisionLog ORDER BY UPDATE_TIMESTAMP DESC LIMIT 1;"
 }
 
 db_get_fk_violations_count() {
+	$STRICT
 	sqlite3 "$DB" "PRAGMA foreign_key_check;" | wc -l | sed -e 's| ||g'
 }
 
 db_check_fk_violations() {
+	$STRICT
 	local violations
 	violations=$(db_get_fk_violations_count)
 
@@ -172,6 +189,7 @@ db_check_fk_violations() {
 }
 
 db_print_stats() {
+	$STRICT
 	local DB="$1"
 	echo "... the database has:"
 	echo "... - $(sqlite3 $DB 'SELECT count(*) FROM Port;') port records"
@@ -186,6 +204,7 @@ db_print_stats() {
 ## ports tree revision handling functions
 
 ports_tree_get_current_revision() {
+	$STRICT
 	local PD=$1
 
 	(cd $PD && git rev-parse HEAD) \
@@ -193,6 +212,7 @@ ports_tree_get_current_revision() {
 }
 
 ports_tree_traverse() {
+	$STRICT
 	local PD=$1
 	local SUBDIR=$2
 
@@ -201,12 +221,15 @@ ports_tree_traverse() {
 }
 
 save_ports_tree_revision() {
+	$STRICT
 	local revision=$1
 	local comment="$2"
+
 	run_SQL "INSERT into RevisionLog(UPDATE_TIMESTAMP, GIT_HASH, COMMENT) VALUES(DATETIME('now'), '$revision', '$comment');"
 }
 
 write_ports_tree_revision() {
+	$STRICT
 	local PD=$1
 	local comment="$2"
 	local revision
@@ -219,6 +242,7 @@ write_ports_tree_revision() {
 ## git-related
 
 git_diff_revisions_to_pkgorigin() { # returns list of changed pkgorigins between two given revisions
+	$STRICT
 	local PD=$1
 	local rev1="$2"
 	local rev2="$3"
@@ -239,6 +263,7 @@ git_diff_revisions_to_pkgorigin() { # returns list of changed pkgorigins between
 ## SQL file handling
 
 sql_file_begin() {
+	$STRICT
 	local sql_file="$1"
 	local with_schema="$2"
 
@@ -263,6 +288,7 @@ sql_file_begin() {
 ## temporary file handling
 
 delete_temp_files() {
+	$STRICT
 	local tmp_files=""
 
 	if [ $PORTSDIR_EFFECTIVE != $PORTSDIR ]; then

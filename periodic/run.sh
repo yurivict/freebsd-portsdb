@@ -1,6 +1,7 @@
 #!/bin/sh
 
-set -euo pipefail
+STRICT="set -euo pipefail"
+$STRICT
 
 ##
 ## run.sh is a script that updates PortsDB that can be periodically
@@ -60,19 +61,23 @@ fi
 ##
 
 git_last_commit_hash() {
+	$STRICT
 	(cd $PORTSDIR && git log -n1 --format=format:"%H")
 }
 
 db_hash() {
+	$STRICT
 	sha256 -q ports.sqlite
 }
 
 timestamp() {
+	$STRICT
 	local location=$1
 	echo "timestamp($location, pid=$$): $(date "+%Y-%m-%d %H:%M:%S")"
 }
 
 fail() {
+	$STRICT
 	local msg="$1"
 
 	timestamp "error"
