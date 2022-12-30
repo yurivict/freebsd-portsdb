@@ -78,8 +78,10 @@ update() {
 		if [ -d $PD/$po ]; then # otherwise this pkgorigin was removed
 			echo "updating pkgorigin[$n of $num]=$po"
 			ports_tree_traverse $PD $po > /dev/null 2>&1 || fail "failed to update of the pkgorigin[$n]=$po ... exiting"
-			n=$((n+1))
+		else
+			echo "removing pkgorigin[$n of $num]=$po"
 		fi
+		n=$((n+1))
 		# count
 		UPDATED_PKGORIGIN_COUNT=$((UPDATED_PKGORIGIN_COUNT+1))
 	done
