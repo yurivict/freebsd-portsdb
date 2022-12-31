@@ -83,7 +83,7 @@ for name in DB \
 	MAINTAINER WWW \
 	COMPLETE_OPTIONS_LIST OPTIONS_DEFAULT \
 	FLAVORS \
-	COMMENT PKGBASE PKGNAME USES \
+	COMMENT PKGBASE PKGNAME PKGNAMESUFFIX USES \
 	PKG_DEPENDS FETCH_DEPENDS EXTRACT_DEPENDS PATCH_DEPENDS BUILD_DEPENDS LIB_DEPENDS RUN_DEPENDS TEST_DEPENDS \
        	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
@@ -114,6 +114,7 @@ FLAVORw=$(wrap_non_nullable_string "$FLAVOR")
 COMMENTw=$(expand_dollar_sign "$(wrap_non_nullable_string "$(escape_special_chars "$COMMENT")")")
 PKGBASEw=$(wrap_non_nullable_string "$PKGBASE")
 PKGNAMEw=$(wrap_non_nullable_string "$PKGNAME")
+PKGNAMESUFFIXw=$(wrap_nullable_string "$PKGNAMESUFFIX")
 USESw=$(wrap_nullable_string "$USES")
 USE_GITHUBw=$(wrap_non_nullable_string "$USE_GITHUB")
 GH_ACCOUNTw=$(wrap_non_nullable_string "$GH_ACCOUNT")
@@ -138,7 +139,7 @@ insert_port() {
 }
 insert_flavor() {
 	$STRICT
-	run_SQL "INSERT INTO PortFlavor(PKGORIGIN,FLAVOR,COMMENT,PKGBASE,PKGNAME,USES) VALUES ($PKGORIGINw,$FLAVORw,$COMMENTw,$PKGBASEw,$PKGNAMEw,$USESw)"
+	run_SQL "INSERT INTO PortFlavor(PKGORIGIN,FLAVOR,COMMENT,PKGBASE,PKGNAME,PKGNAMESUFFIX,USES) VALUES ($PKGORIGINw,$FLAVORw,$COMMENTw,$PKGBASEw,$PKGNAMEw,$PKGNAMESUFFIXw,$USESw)"
 }
 insert_dependencies() {
 	$STRICT
@@ -199,7 +200,7 @@ if [ -z "$FLAVORS" -o $(list_begins_with "$FLAVOR" "$FLAVORS") = "YES" ]; then #
 	insert_port
 	insert_flavor
 else # subsequent flavors
-	log "adding subsequent PortFlavor record for $PKGORIGIN: FLAVOR=$FLAVOR FLAVORS=$FLAVORS PKGBASE=$PKGBASE PKGNAME=$PKGNAME"
+	log "adding subsequent PortFlavor record for $PKGORIGIN: FLAVOR=$FLAVOR FLAVORS=$FLAVORS PKGBASE=$PKGBASE PKGNAME=$PKGNAME PKGNAMESUFFIX=$PKGNAMESUFFIX"
 	insert_flavor
 fi
 
