@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2022 by Yuri Victorovich. All rights reserved.
+# Copyright (C) 2022-2023 by Yuri Victorovich. All rights reserved.
 
 
 ##
