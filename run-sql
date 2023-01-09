@@ -30,6 +30,7 @@ CODEBASE=$(dirname "$SCRIPT")
 ##
 
 PORTSDB=${PORTSDB:-./ports.sqlite} # default value
+[ -f "$PORTSDB" ] || PORTSDB=$CODEBASE/ports.sqlite
 
 [ -f $PORTSDB ] || echo "can't find PortsDB at '$PORTSDB', please set the PORTSDB environment variable"
 

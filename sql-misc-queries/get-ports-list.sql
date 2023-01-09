@@ -1,0 +1,4 @@
+SELECT
+	PKGORIGIN
+FROM
+	Port
