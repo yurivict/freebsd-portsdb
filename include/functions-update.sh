@@ -3,7 +3,7 @@
 # Copyright (C) 2022-2023 by Yuri Victorovich. All rights reserved.
 
 ##
-## library of functions for the import module
+## library of functions for the update module
 ##
 
 ## set strict mode
