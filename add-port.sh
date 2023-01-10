@@ -73,6 +73,11 @@ expand_dollar_sign() {
 	$STRICT
 	echo "$1" | sed -e "s|%%DOLLAR%%|$|g"
 }
+normalize_makefile() {
+	$STRICT
+	# the filter chooses makefiles (1) only in the ports tree (2) not in the current port's directory
+	echo $1 | xargs realpath | (grep "^$PORTSDIR" || true) | sed -e "s|^$PORTSDIR/||" | (grep -v "^$PKGORIGIN/" || true)
+}
 
 ##
 ## read supplied arguments
@@ -89,7 +94,8 @@ for name in DB \
        	USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 	USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
 	DEPRECATED EXPIRATION_DATE \
-	BROKEN ; \
+	BROKEN \
+	MAKEFILES ; \
 do
 	eval "$name=\"$1\""
 	shift
@@ -193,6 +199,17 @@ insert_broken() {
 	$STRICT
 	run_SQL "INSERT INTO Broken(PKGORIGIN, FLAVOR, BROKEN) VALUES($PKGORIGINw,$FLAVORw,$BROKENw)"
 }
+insert_makefile_dependencies() {
+	$STRICT
+	for m in $MAKEFILES; do
+		if [ $m != "Makefile" ]; then
+			m=$(cd $PORTSDIR/$PKGORIGIN && normalize_makefile $m)
+			if [ -n "$m" ]; then
+				run_SQL "INSERT INTO MakefileDependencies(PKGORIGIN, FLAVOR, MAKEFILE) VALUES($PKGORIGINw,$FLAVORw,$(wrap_non_nullable_string $m))"
+			fi
+		fi
+	done
+}
 
 ##
 ## MAIN: insert records into the DB
@@ -236,3 +253,5 @@ fi
 if [ -n "$BROKEN" ]; then
 	insert_broken
 fi
+
+insert_makefile_dependencies

@@ -137,6 +137,7 @@ fi
 export DB
 export SQL_FILE
 export CODEBASE
+export PORTSDIR
 
 ##
 ## MAIN

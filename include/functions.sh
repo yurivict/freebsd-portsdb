@@ -50,7 +50,7 @@ check_dependencies() {
 	$STRICT
 	local res=0
 
-	for dep in cat cp date false git grep gsed hostname make mktemp patch printf rm sed sha256 sort sqlite3 sysctl true uniq wc [; do
+	for dep in cat cp date false git grep gsed hostname make mktemp patch printf realpath rm sed sha256 sort sqlite3 sysctl true uniq wc xargs [; do
 		if [ $(echo $(which $dep) | wc -w | sed -e 's| ||g') = 0 ]; then
 			perror "error: $dep dependency is missing"
 			res=1
@@ -129,7 +129,8 @@ describe_command() {
 		USE_GITHUB GH_ACCOUNT GH_PROJECT GH_TAGNAME \
 		USE_GITLAB GL_SITE GL_ACCOUNT GL_PROJECT GL_COMMIT \
 		DEPRECATED EXPIRATION_DATE \
-		BROKEN ; \
+		BROKEN \
+		.MAKE.MAKEFILES ; \
 	do
 		if [ $name = "COMMENT" -o $name = "DEPRECATED" -o $name = "BROKEN" ]; then
 			cmd_args="$cmd_args '@@@{$name:S/\\@@@/%%DOLLAR%%/g}'"
@@ -159,6 +160,7 @@ db_delete_pkgorigin_sql() {
 	$STRICT
 	local pkgorigin=$1
 	local SQL=""
+	SQL="${SQL}DELETE FROM MakefileDependencies WHERE PKGORIGIN='$pkgorigin';\n"
 	SQL="${SQL}DELETE FROM Broken WHERE PKGORIGIN='$pkgorigin';\n"
 	SQL="${SQL}DELETE FROM Deprecated WHERE PKGORIGIN='$pkgorigin';\n"
 	SQL="${SQL}DELETE FROM GitLab WHERE PKGORIGIN='$pkgorigin';\n"
