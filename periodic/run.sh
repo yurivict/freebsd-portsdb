@@ -39,7 +39,7 @@ if [ -z "$PORTDSB_UPDATE_CMD" -o -z "$UPLOAD_CMD" ]; then
 	
 fi
 
-for p in date sha256 sqlite3 git gsed cat sysctl; do
+for p in date sha256 sqlite3 git gsed cat sysctl xz; do
 	if [ -z "$(which $p)" ]; then
 		echo "error: dependency '$p' is missing"
 		exit 1
@@ -133,13 +133,15 @@ fail() {
 		fi
 		# save last commit's hash that's in DB
 		git_last_commit_hash > repo.commit.sha256
+		# compress DB
+		xz -T 0 -9 < ports.sqlite > ports.sqlite.xz
 	fi
 
 	# upload (DB -> file hosting)
 	if [ $ANY_UPDATES = yes ] || ! [ -f ports.sqlite.sha256 ] || [ "$(cat ports.sqlite.sha256)" != $(db_hash) ]; then
 		echo "uploading ports.sqlite with sha256=$(db_hash) ..."
 		# actual upload
-		($UPLOAD_CMD ports.sqlite) > upload.log 2>upload.err || fail "upload command failed: $(cat upload.err)"
+		($UPLOAD_CMD ports.sqlite.xz) > upload.log 2>upload.err || fail "upload command failed: $(cat upload.err)"
 		# save last uploaded DB hash
 		db_hash > ports.sqlite.sha256
 	fi
