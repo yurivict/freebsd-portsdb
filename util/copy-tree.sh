@@ -6,9 +6,8 @@ set -euo pipefail
 
 
 PORTSDIR=$1
-NEW_TREE=$2
+NEW_TREE=$2 # assume that the $NEW_TREE directory exists
 
-mkdir $NEW_TREE
 for d in $(cd $PORTSDIR && ls); do
 	if [ -d "$PORTSDIR/$d" -a -f "$PORTSDIR/$d/Makefile" ]; then
 		ln -s $PORTSDIR/$d $NEW_TREE/$d

@@ -88,10 +88,7 @@ patch_ports_tree() {
 	local PD_PATCHED
 
 	# generate temp file name
-	PD_PATCHED=$(mktemp -t portsdir)
-
-	# remove the temp file: we will create the directory instead of this file
-	rm $PD_PATCHED || fail "failed to remove the temp file $PD_PATCHED"
+	PD_PATCHED=$(mktemp -d -t portsdir)
 
 	# copy
 	$CODEBASE/util/copy-tree.sh $PD_ORIGINAL $PD_PATCHED || fail "failed to copy the ports tree $PD_ORIGINAL -> $PD_PATCHED"
