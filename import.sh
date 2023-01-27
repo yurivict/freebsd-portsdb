@@ -115,7 +115,7 @@ fi
 # create the file for SQL statements that will be written after traversing the ports tree
 if [ -z "$SQL_FILE" ]; then
 	# generate temporary SQL file if not provided by the user
-	SQL_FILE=$(mktemp /tmp/ports.sql.XXXXXX)
+	SQL_FILE=$(mktemp -t ports.sql)
 fi
 
 ##
