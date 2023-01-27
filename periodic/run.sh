@@ -39,9 +39,9 @@ if [ -z "$PORTDSB_UPDATE_CMD" -o -z "$UPLOAD_CMD" ]; then
 	
 fi
 
-for p in date sha256 sqlite3 git gsed cat sysctl xz; do
-	if [ -z "$(which $p)" ]; then
-		echo "error: dependency '$p' is missing"
+for dep in date sha256 sqlite3 git gsed cat sysctl xz; do
+	if ! which -s $dep; then
+		echo "error: dependency '$dep' is missing"
 		exit 1
 	fi
 done
